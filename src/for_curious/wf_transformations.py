@@ -25,7 +25,8 @@ def main(WFPath, PropsPath, ChrumPath):
 	f.close()
 	condic = readConfiguration(con,{})
 	after = allTran(wf,condic,ChrumPath)
-	xml_val = str(xml.dom.minidom.parseString(allTran(wf,condic,ChrumPath)).toprettyxml())
+	#print after
+	xml_val = str(xml.dom.minidom.parseString(after).toprettyxml())
 	
 	while True:
 		tmp = xml_val

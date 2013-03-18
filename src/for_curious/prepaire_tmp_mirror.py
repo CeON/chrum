@@ -31,6 +31,18 @@ def main(compilation_time, keywords, chrumprops, keys, combs, names, directory):
 	f.close()
 	os.system('chmod +x '+directory+'/execute-all-in-oozie.py')
 		
+def rightSignOrElse(str):
+	sto = str.rfind('/')
+	if sto!=-1:
+		return sto
+	return len(str)
+
+def leftSignOrElse(str):
+	sto = str.find('/')
+	if sto!=-1:
+		return sto
+	return 0
+
 def calculateGivenCombination(compilation_time, keywords, chrumprops, keys, combs, names, directory, plainName, name, idx):
 		a = directory+'/default'
 		b = directory+'/'+name
@@ -48,8 +60,7 @@ def calculateGivenCombination(compilation_time, keywords, chrumprops, keys, comb
 		f = open(directory+'/'+name+'/'+plainName,'w')
 		f.write('\n'.join(txt2))
 		f.close()
-		
-		sto = sys.argv[0].rfind('/')
+		sto = rightSignOrElse(sys.argv[0])
 		execPath = sys.argv[0][:sto]
 		
 #		print sys.argv[1] #''' CONF.CHRUM     '''
@@ -59,8 +70,10 @@ def calculateGivenCombination(compilation_time, keywords, chrumprops, keys, comb
 		
 		wftxt = wf_transformations.main(sys.argv[3],directory+'/'+name+'/'+plainName,execPath)
 		
-		sta = sys.argv[3].rfind('/')
+		sta = leftSignOrElse(sys.argv[3])
 		wfname = sys.argv[3][sta:len(sys.argv[3])-len('.chrum')]
+		shortname = wfname
+		longname = sys.argv[3][sta:len(sys.argv[3])]
 #		print directory+'/'+name+'/'+wfname
 		f = open(directory+'/'+name+'/'+wfname,'w')
 		f.write(wftxt)
@@ -78,7 +91,9 @@ def calculateGivenCombination(compilation_time, keywords, chrumprops, keys, comb
 			'hdfs_wf_config' : hdfsProps,
 			'hdfsPth' : hdfsPth,
 			'hdfsSrc' : hdfsSrc,
-			'localWfSrc' : localWfSrc
+			'localWfSrc' : localWfSrc,
+			'longname' : longname,
+			'shortname' : shortname
 			}
   
 		s = string.Template('\
@@ -95,8 +110,8 @@ else:\n\
 	path = os.getcwd()\n\
 os.chdir(path)\n\
 #perform cluster.properties substitution\n\
-chrum_wf_props = os.getcwd()+\'/cluster.properties.chrum\'\n\
-wf_props = os.getcwd()+\'/cluster.properties\'\n\
+chrum_wf_props = os.getcwd()+\'/$longname\'\n\
+wf_props = os.getcwd()+\'/$shortname\'\n\
 f = open(chrum_wf_props,\'r\')	\n\
 txt = f.read()	\n\
 f.close()	\n\
@@ -116,7 +131,7 @@ os.system(\'hadoop fs -cp $hdfsSrc $hdfsPth/\'+exec_time+\'/\')	\n\
 #list all added files\n\
 os.system(\'hadoop fs -ls $hdfsPth/\'+exec_time+\'/\')	\n\
 #run oozie workflow\n\
-os.system(\'oozie job -oozie http://$oozie_server:$oozie_port/oozie -config ./cluster.properties -run\')	\n\
+os.system(\'oozie job -oozie http://$oozie_server:$oozie_port/oozie -config \'+wf_props+\' -run\')	\n\
 #os.system(\'oozie job -oozie http://$oozie_server:$oozie_port/oozie -config $hdfsPth/\'+exec_time+\'/cluster.properties -run\')	\n\
 ')
 		f = open(directory+'/'+name+'/execute-in-oozie.py','w')
