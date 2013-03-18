@@ -17,6 +17,7 @@ def readConfiguration(text,props):
 				txt = srh.group(1)
 				if not props.has_key(txt):
 					print 'The property '+txt+' has beed used before it has been defined'
+					break
 				else:
 					line = line.replace(str('${'+txt+'}'),str(props[txt]))
 					break
