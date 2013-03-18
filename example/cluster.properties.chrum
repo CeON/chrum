@@ -7,12 +7,12 @@ queueName=default
 project=coansys
 subproject=dc-train-model
 ###################### AUXIL 
-dc_time_infix=@TIME_INFIX@
-dc_opts_infix=@OPTS_INFIX@
-dc_time_sufix=@TIME_SUFIX@
-dc_join_infix=@TIME_INFIX@/@OPTS_INFIX@
+dc_time_infix=${COMPILATION_TIME}
+dc_opts_infix=${PARAMETER_COMBINATION}
+dc_time_sufix=${EXECUTION_TIME}
+dc_join_infix=${dc_time_infix}/${dc_opts_infix}
 dc_general_prefix=${nameNode}/user/${user.name}/workflows/${subproject}/
-dc_general_prefix_join_infix=${dc_general_prefix}/@TIME_INFIX@/@OPTS_INFIX@/@TIME_SUFIX@/
+dc_general_prefix_join_infix=${dc_general_prefix}/${dc_time_infix}/${dc_opts_infix}/${dc_time_sufix}/
 ###################### OOZIE
 oozie.wf.application.path=${dc_general_prefix_join_infix}/workflow
 results=${dc_general_prefix_join_infix}/results/
