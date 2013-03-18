@@ -30,14 +30,20 @@ def main(compilation_time, keywords, chrumprops, keys, combs, names, directory):
 	f.write('\n'.join(full_exec)) 
 	f.close()
 	os.system('chmod +x '+directory+'/execute-all-in-oozie.py')
+
+def rightSignOrZero(str):
+	sto = str.rfind('/')
+	if sto!=-1:
+		return sto
+	return 0
 		
-def rightSignOrElse(str):
+def rightSignOrMax(str):
 	sto = str.rfind('/')
 	if sto!=-1:
 		return sto
 	return len(str)
 
-def leftSignOrElse(str):
+def leftSignOrZero(str):
 	sto = str.find('/')
 	if sto!=-1:
 		return sto
@@ -65,32 +71,23 @@ def calculateGivenCombination(compilation_time, keywords, chrumprops, keys, comb
 		substitutedWFPropertiesPath = directory+'/'+name+'/'+plainName 	
 		substituteChrumWFProps(substitutedWFPropertiesPath,name,combs,keys,idx,compilation_time)
 		
-		execPath = sys.argv[0][:rightSignOrElse(sys.argv[0])]
-		sta = rightSignOrElse(sys.argv[3])
-		wfname = sys.argv[3][sta:len(sys.argv[3])-len('.chrum')]
-
-		sta = rightSignOrElse(sys.argv[2])
+		execPath = sys.argv[0][:rightSignOrMax(sys.argv[0])]
+#		sta = rightSignOrZero(sys.argv[3])
+		wfname = 'workflow.xml'#sys.argv[3][sta:len(sys.argv[3])-len('.chrum')]
+		sta = rightSignOrZero(sys.argv[2])
 		finalWFPropertiesPath = directory+'/'+name+'/'+sys.argv[2][sta:len(sys.argv[2])-len('.chrum')]
+#		finalWFPropertiesPath = directory+'/'+name+'/workflow.xml'
 
 		wftxt = wf_transformations.main(execPath,substitutedWFPropertiesPath,sys.argv[3])
-#		wftxt = wf_transformations.main(sys.argv[3],execPath,directory+'/'+name+'/'+substitutedWFXMLPath)
-		
-#		print directory+'/'+name+'/'+wfname
 		substitutedWFXMLPath = directory+'/'+name+'/'+wfname
 		f = open(substitutedWFXMLPath,'w')
 		f.write(wftxt)
 		f.close()
 		
-		localPropsTmp = '/'.join([keywords['HDFS'],keywords['PROJECT'],compilation_time,name,plainName])
-		print localPropsTmp  
-		hdfsProps = '/'.join([keywords['HDFS'],keywords['PROJECT'],compilation_time,name,plainName])
-		print hdfsProps 
+		hdfsProps = '/'.join([keywords['HDFS'],keywords['PROJECT'],compilation_time,name,plainName]) 
 		hdfsPth = '/'.join([keywords['HDFS'],keywords['PROJECT'],compilation_time,name])
-		print hdfsPth
 		hdfsSrc = '/'.join([keywords['HDFS'],keywords['PROJECT'],compilation_time,'default/*'])
-		print hdfsSrc
 		localWfSrc = directory+'/'+name+'/'+wfname
-		print localWfSrc
 		subs = {'plain_name' : plainName, 
 			'oozie_server' : keywords['OOZIE_SERVER'], 
 			'oozie_port' : keywords['OOZIE_PORT'],
