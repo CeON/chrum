@@ -38,7 +38,7 @@ def main(WFPath, PropsPath, ChrumPath):
 transformations = [remove_one_line_comments,insert_conf,idioms_replacement,node_substitution,remove_many_newlines]
 def allTran(text,props,path):
 	for i in transformations:
-		print i
+#		print i
 		text = i(text,props,path+"for_curious/wf_trans/")
 	return text
 

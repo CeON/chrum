@@ -3,8 +3,8 @@
  (C) 2010-2013 ICM UW. All rights reserved.
 '''
 
-import shutil
-import time
+#import shutil
+#import time
 import re
 
 ###############################################
@@ -21,7 +21,7 @@ def main(propsPath):
 		for line in text.split('\n'):
 			line = line.strip()
 			for i in re.finditer('^@([^@\W]+?)@([^\n]+)',line):
-				var_val[i.group(1)] = list(re.search('([^\W]+)',i.group(2)).groups())
+				var_val[i.group(1)] = list(re.split('[\s]+',i.group(2).strip()))
 		combs = calculateParamCombinations(var_val)
 		coolNames = createCoolName(combs,var_val.keys())
 		return var_val.keys(), combs, coolNames
@@ -31,7 +31,8 @@ def createCoolName(combs,keys):
 	for comb in combs:
 		final = []
 		for idx,tup in enumerate(comb):
-			final.append(str(keys[idx])+'__'+str(tup)+'__')
+			final.append(str(tup))
+#			final.append(str(keys[idx])+'__'+str(tup)+'__')
 		retval.append(','.join(final))
 	return retval
 		

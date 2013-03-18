@@ -11,34 +11,6 @@ import sys
 ###############################################
 ######## DEFINITION BLOCK #####################
 ###############################################
-def copyFilesNeeded(propsDir,directory,compilation_time, copylist):
-	shutil.copy(sys.argv[1], directory)
-	proj_props = ''
-	idx = sys.argv[2].rfind('/')
-	if idx !=-1:
-		proj_props = sys.argv[2][idx+1:]
-	else:
-		 proj_props = sys.argv[2]
-	
-	fr = open(sys.argv[2],'r')
-	fw = open(directory+'/'+proj_props,'w')
-	fw.write('COMPILATION_TIME='+compilation_time+'\n'+fr.read())
-	fw.close();fr.close()
-	os.makedirs(directory+'/results')
-	shutil.copy(sys.argv[3], directory)
-	currDir = os.getcwd()
-	os.chdir(sys.argv[2][:idx])
-	for di,fils in copylist.items():
-		fulldi = directory+di+'/'
-		for fi in fils: 
-			a = os.path.realpath(fi);b = fulldi
-			if os.path.isdir(a):
-				shutil.copytree(a, b)
-			else:
-				os.makedirs(fulldi)
-				shutil.copy(a,b)
-	os.chdir(currDir)
-
 def readFileToString(path):
 	file_ = open(sys.argv[1],'r')
 	text_ = file_.read()
@@ -69,11 +41,15 @@ def readChrumProps(chrumPropsText,otherPropsDict):
 				else:
 					raise Exception('Undefined parameter \''+match.group(1)+'\' in chrum-properties-file. \
 					\nFirst provide parameter value, then use it.')
+					
+			
+			
 			if any((line.split('=')[0] == 'HDFS',
 				line.split('=')[0]=='LOCAL',
 				line.split('=')[0]=='PROJECT',
 				line.split('=')[0]=='OOZIE_SERVER',
-				line.split('=')[0]=='OOZIE_PORT')):
+				line.split('=')[0]=='OOZIE_PORT',
+				line.split('=')[0]=='LOCAL_TRIGGER')):
 				keywords[line.split('=')[0]]=line.split('=')[1]
 			else:
 				otherPropsDict[line.split('=')[0]]=line.split('=')[1]
@@ -82,8 +58,63 @@ def readChrumProps(chrumPropsText,otherPropsDict):
 			which = line.split('<-')[1].split(',')
 			which = map(str.strip,which)
 			copylist[to]=which
-
+			
+	if any((len(keywords)!=6, not copylist.has_key('lib'))):
+		for i in keywords.iterkeys():
+			print i
+		raise Exception('In chrum-properties \'lib\' folder as well as \'HDFS\', \'LOCAL\', \'PROJECT\',\
+		\'OOZIE_SERVER\' ,\'OOZIE_PORT\', \'LOCAL_TRIGGER\' properties must be defined')
+		
 	return otherPropsDict, copylist, keywords
+
+def removeBeforSlash(str):
+	arr = str.split('/')
+	idx = len(arr) - 1
+	return arr[idx].strip()
+
+def copyFilesNeededLocally(propsDir,directory,compilation_time, copylist):
+	shutil.copy(sys.argv[1], directory)
+	proj_props = ''
+	idx = sys.argv[2].rfind('/')
+	if idx !=-1:
+		proj_props = sys.argv[2][idx+1:]
+	else:
+		 proj_props = sys.argv[2]
+	
+	fr = open(sys.argv[2],'r')
+	fw = open(directory+'/'+proj_props,'w')
+	fw.write('COMPILATION_TIME='+compilation_time+'\n'+fr.read())
+	fw.close();fr.close()
+#	os.makedirs(directory+'/results')
+	shutil.copy(sys.argv[3], directory)
+
+def copyFilesNeededHDFS(propsDir, directory, compilation_time, copylist):
+	idx = sys.argv[2].rfind('/')
+#	if idx !=-1:
+#		proj_props = sys.argv[2][idx+1:]
+#	else:
+#		 proj_props = sys.argv[2]		
+	currDir = os.getcwd()
+	if idx !=-1:
+		os.chdir(sys.argv[2][:idx])
+
+	for di,fils in copylist.items():
+		fulldi = directory+'/'+di+'/'
+		os.system('hadoop fs -mkdir '+fulldi)
+		for fi in fils:
+			fireal = os.path.realpath(fi)
+			os.system('hadoop fs -put '+fireal+' '+fulldi)
+	os.chdir(currDir)
+
+#def removeUselessSlashes(str):
+#	a = str
+#	while True:
+#		l = len(a)
+#		b = a.replace('//','/')
+#		if l == len(b):
+#			break
+#		a=b
+#	return a
 
 def main(args):
 		otherprops = {}
@@ -94,14 +125,20 @@ def main(args):
 		chrumprops, copylist, keywords = readChrumProps(chrumpropstext,otherprops)
 		
 		propsDir = os.path.dirname(os.path.realpath(args[1]))
-		propsDir = propsDir[:propsDir.rindex('/')]
+		propsDir = removeBeforSlash(propsDir)
 	
 		compilation_time = str(time.time())
-		root_dir = '/tmp/chrum/'+compilation_time+'/'+keywords['PROJECT']+'/'+compilation_time+'/'
-		directory = root_dir+'/default/'
-		os.makedirs(directory)
-	
-		copyFilesNeeded(propsDir,directory,compilation_time,copylist)
 		
+		root_dir = '/'.join([keywords['LOCAL_TRIGGER'],keywords['PROJECT'],compilation_time])
+		directory = root_dir+'/'+'default'
+		os.makedirs(directory)
+		copyFilesNeededLocally(propsDir,directory,compilation_time,copylist)
+		hdfs = '/'.join([keywords['HDFS'],keywords['PROJECT'],compilation_time,'default'])
+		os.system('hadoop fs -mkdir '+hdfs)
+		copyFilesNeededHDFS(propsDir,hdfs,compilation_time,copylist)
+		os.system('cp -r '+args[1]+' '+directory)
+		os.system('cp -r '+args[2]+' '+directory)
+		os.system('cp -r '+args[3]+' '+directory)
+		#TODO
 		return compilation_time, keywords, chrumprops, root_dir
 
