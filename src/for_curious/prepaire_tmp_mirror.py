@@ -43,13 +43,9 @@ def leftSignOrElse(str):
 		return sto
 	return 0
 
-def calculateGivenCombination(compilation_time, keywords, chrumprops, keys, combs, names, directory, plainName, name, idx):
-		a = directory+'/default'
-		b = directory+'/'+name
-		shutil.copytree(a, b)
-		
-		f = open(directory+'/'+name+'/'+plainName,'r')
-		txt = 'PARAMETER_COMBINATION='+name+'\n'+f.read()
+def substituteChrumWFProps(chrumProps,name,combs,keys,idx,compilation_time):
+		f = open(chrumProps,'r')
+		txt = 'COMPILATION_TIME='+compilation_time+'\nPARAMETER_COMBINATION='+name+'\n'+f.read()
 		f.close()
 		txt2 = []
 		for li in txt.split('\n'): 
@@ -57,34 +53,44 @@ def calculateGivenCombination(compilation_time, keywords, chrumprops, keys, comb
 				if re.search('^@'+keys[inner_idx]+'@',li):
 					li = keys[inner_idx]+'='+combs[idx][inner_idx]
 			txt2.append(li)
-		f = open(directory+'/'+name+'/'+plainName,'w')
+		f = open(chrumProps,'w')
 		f.write('\n'.join(txt2))
 		f.close()
-		sto = rightSignOrElse(sys.argv[0])
-		execPath = sys.argv[0][:sto]
+
+def calculateGivenCombination(compilation_time, keywords, chrumprops, keys, combs, names, directory, plainName, name, idx):
+		a = directory+'/default'
+		b = directory+'/'+name
+		shutil.copytree(a, b)
 		
-#		print sys.argv[1] #''' CONF.CHRUM     '''
-#		print sys.argv[2] #''' WF.CONF.PROPS  '''
-#		print sys.argv[3] #''' WORKFLOW       '''
-#		main(, PropsPath, ChrumPath):
+		substitutedWFPropertiesPath = directory+'/'+name+'/'+plainName 	
+		substituteChrumWFProps(substitutedWFPropertiesPath,name,combs,keys,idx,compilation_time)
 		
-		wftxt = wf_transformations.main(sys.argv[3],directory+'/'+name+'/'+plainName,execPath)
-		
-		sta = leftSignOrElse(sys.argv[3])
+		execPath = sys.argv[0][:rightSignOrElse(sys.argv[0])]
+		sta = rightSignOrElse(sys.argv[3])
 		wfname = sys.argv[3][sta:len(sys.argv[3])-len('.chrum')]
-		shortname = wfname
-		longname = sys.argv[3][sta:len(sys.argv[3])]
+
+		sta = rightSignOrElse(sys.argv[2])
+		finalWFPropertiesPath = directory+'/'+name+'/'+sys.argv[2][sta:len(sys.argv[2])-len('.chrum')]
+
+		wftxt = wf_transformations.main(execPath,substitutedWFPropertiesPath,sys.argv[3])
+#		wftxt = wf_transformations.main(sys.argv[3],execPath,directory+'/'+name+'/'+substitutedWFXMLPath)
+		
 #		print directory+'/'+name+'/'+wfname
-		f = open(directory+'/'+name+'/'+wfname,'w')
+		substitutedWFXMLPath = directory+'/'+name+'/'+wfname
+		f = open(substitutedWFXMLPath,'w')
 		f.write(wftxt)
 		f.close()
 		
-		localPropsTmp = '/'.join([keywords['HDFS'],keywords['PROJECT'],compilation_time,name,plainName]) 
-		hdfsProps = '/'.join([keywords['HDFS'],keywords['PROJECT'],compilation_time,name,plainName]) 
+		localPropsTmp = '/'.join([keywords['HDFS'],keywords['PROJECT'],compilation_time,name,plainName])
+		print localPropsTmp  
+		hdfsProps = '/'.join([keywords['HDFS'],keywords['PROJECT'],compilation_time,name,plainName])
+		print hdfsProps 
 		hdfsPth = '/'.join([keywords['HDFS'],keywords['PROJECT'],compilation_time,name])
+		print hdfsPth
 		hdfsSrc = '/'.join([keywords['HDFS'],keywords['PROJECT'],compilation_time,'default/*'])
+		print hdfsSrc
 		localWfSrc = directory+'/'+name+'/'+wfname
-		
+		print localWfSrc
 		subs = {'plain_name' : plainName, 
 			'oozie_server' : keywords['OOZIE_SERVER'], 
 			'oozie_port' : keywords['OOZIE_PORT'],
@@ -92,8 +98,9 @@ def calculateGivenCombination(compilation_time, keywords, chrumprops, keys, comb
 			'hdfsPth' : hdfsPth,
 			'hdfsSrc' : hdfsSrc,
 			'localWfSrc' : localWfSrc,
-			'longname' : longname,
-			'shortname' : shortname
+			'substitutedWFPropertiesPath' : substitutedWFPropertiesPath,
+			'finalWFPropertiesPath' : finalWFPropertiesPath,
+			'substitutedWFXMLPath' : substitutedWFXMLPath
 			}
   
 		s = string.Template('\
@@ -110,12 +117,12 @@ else:\n\
 	path = os.getcwd()\n\
 os.chdir(path)\n\
 #perform cluster.properties substitution\n\
-chrum_wf_props = os.getcwd()+\'/$longname\'\n\
-wf_props = os.getcwd()+\'/$shortname\'\n\
+chrum_wf_props = \'/$substitutedWFPropertiesPath\'\n\
+wf_props = \'/$substitutedWFXMLPath\'\n\
 f = open(chrum_wf_props,\'r\')	\n\
 txt = f.read()	\n\
 f.close()	\n\
-f = open(wf_props,\'w\')	\n\
+f = open(\'$finalWFPropertiesPath\',\'w\')	\n\
 exec_time=str(time.time())	\n\
 f.write(\'\
 EXECUTION_TIME=\'+exec_time+\'\\n\
@@ -131,7 +138,7 @@ os.system(\'hadoop fs -cp $hdfsSrc $hdfsPth/\'+exec_time+\'/\')	\n\
 #list all added files\n\
 os.system(\'hadoop fs -ls $hdfsPth/\'+exec_time+\'/\')	\n\
 #run oozie workflow\n\
-os.system(\'oozie job -oozie http://$oozie_server:$oozie_port/oozie -config \'+wf_props+\' -run\')	\n\
+os.system(\'oozie job -oozie http://$oozie_server:$oozie_port/oozie -config $finalWFPropertiesPath -run\')	\n\
 #os.system(\'oozie job -oozie http://$oozie_server:$oozie_port/oozie -config $hdfsPth/\'+exec_time+\'/cluster.properties -run\')	\n\
 ')
 		f = open(directory+'/'+name+'/execute-in-oozie.py','w')

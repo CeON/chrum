@@ -14,8 +14,9 @@ from readconf import *
 #############################################
 ########### FUNCTION DEFINITIONS ############
 #############################################
-def main(WFPath, PropsPath, ChrumPath):
-	ChrumPath = ChrumPath + '/'
+def main(ChrumPath, PropsPath, WFPath):
+	
+#	ChrumPath = ChrumPath 
 	f = open(WFPath,'r')
 	wf = f.read()
 	f.close()
@@ -40,7 +41,7 @@ transformations = [remove_one_line_comments,insert_conf,idioms_replacement,node_
 def allTran(text,props,path):
 	for i in transformations:
 #		print i
-		text = i(text,props,path+"for_curious/wf_trans/")
+		text = i(text,props,path+"/for_curious/wf_trans/")
 	return text
 
 #############################################
