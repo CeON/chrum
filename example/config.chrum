@@ -53,7 +53,6 @@ create a new folder, which name is taken from execution time.
    |
    +----->[COMPILATION_TIME,e.g.123]
    |			 +----->[PARAMETER_COMBINATION,e.g.7_src_true]
-   |			 |			+----->*delete-given-results.py*
    |			 |			+----->*execute-in-oozie.py*
    | 			 |			+----->*configuration.properties.chrum* / HDFS/(...)/*configuration.properties*
    | 			 |			+----->*conf.chrum*
@@ -91,15 +90,19 @@ create a new folder, which name is taken from execution time.
 
 '''
 
-OOZIE_SERVER=hadoop-master.org
-OOZIE_PORT=11000
-
+#hdfs://localhost.localdomain:8020/user/${someuser}/workflows/PROJECT/COMPILATION_TIME/OPTIONS/[RESULTS]/EXEC_TIME
 #lib <- ../../document-classification-1.0-SNAPSHOT.jar
-#lib <- /usr/lib/pig/pig-0.9.2-cdh4.0.1.jar,../../../../document-classification/target/document-classification-1.0-SNAPSHOT.jar
-pig <- ./pig/ #That will copy the whole folder
+#HDFS=hdfs://localhost.localdomain/user/${HUSER}/workflows/
+#HDFS=hdfs://localhost.localdomain:8020/user/${HUSER}/workflows/
 
-# hdfs://localhost.localdomain:8020/user/${someuser}/workflows/PROJECT/COMPILATION_TIME/OPTIONS/[RESULTS]/EXEC_TIME
+LOCAL_TRIGGER=/home/pdendek/trigger
+OOZIE_SERVER=localhost.localdomain
+OOZIE_PORT=11000
+lib <- /usr/lib/pig/pig-0.9.2-cdh4.0.1.jar
+#,../../../../document-classification/target/document-classification-1.0-SNAPSHOT.jar
+pig <- ./pig/*
+#That will copy the whole folder
 
-HDFS=hdfs://localhost.localdomain:8020/user/${HUSER}/workflows/
+HDFS=/user/${HUSER}/workflows/
 LOCAL=/home/username/workflow/
 PROJECT=dc_model_creation
