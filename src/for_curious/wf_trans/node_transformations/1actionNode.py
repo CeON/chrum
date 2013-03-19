@@ -46,12 +46,11 @@ def NODETRANSFORMATIONactionTran(text):
 			if replaceDict.has_key(name):
 				raise WorkflowFileError('Alias '+name+' has been used more then once. Please, use each alias only once.')
 			content = ''.join(out_script)
+			out_script = []
 			replaceDict[name] = content;
 		except WorkflowFileError as e:
 			print e.value
 			pass
-
 	for i in replaceDict:
-		text = re.sub(r''+i+'[.\S\s]*?\# END\:ACTION', replaceDict[i], text)
-
+		text = re.sub(r''+i.replace('#','\#').replace(':',"\:")+'[.\w\W]*?\# END\:ACTION', replaceDict[i], text)
 	return text

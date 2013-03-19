@@ -20,8 +20,9 @@ def node_substitution(text,props,path):
 #		print i
 		for f in dir(i):
 			if f.startswith('NODETRANSFORMATION'):
+#				print '=========\n=========\n========='+f+'\n=========\n=========\n'
 				methodToCall = getattr(i, f)
 				text = methodToCall(text)
-				#text = i[f](text)
+#				print text
 	os.chdir(currPath)
 	return text
