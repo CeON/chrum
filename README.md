@@ -1,5 +1,8 @@
 chrum - The Apache Oozie Workflow Generator
 =====
+----
+
+Check  [wiki page](.wiki/)
 
 ----
 
@@ -10,7 +13,11 @@ This project is currently UNSTABLE - please wait for full version
 ## For impatients
 
 ### General routine
-1. Clone this repository and copy into your project directory structure into $PROJECT/src/main/ folder
+1. Clone this repository into any localization ($CHRUM)
+2. Prepare config.chrum, workflow.properties.chrum and workflow.xml.chrum files
+3. Launch Chrum (a) python $CHRUM/full_chrum_action.py config.chrum workflow.properties.chrum workflow.xml.chrum
+ 
+ 
 2. Redefine a stub workflow file
 3. Change a configuration file according to your cluster setting as well as a set of properties used
 4. Execute locally a script `./chrum-compile.sh` localizated in the folder $PROJECT/src/main/oozie
