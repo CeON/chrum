@@ -1,108 +1,16 @@
-# (C) 2010-2012 ICM UW. All rights reserved.
+#
+# (C) 2010-2013 ICM UW. All rights reserved.
+#
 
-'''
-In this file one can specify:
-(1) folders to be created and populated by listed files, 
-	e.g. "pig <- ../pig/*.pig" will create folder pig 
-	with all files *.pig from ../pig folder
-(2) what would be the HDFS/LOCAL destination of a project
-	(2.1) if the parameter LOCAL would not be specified, 
-	a local copy of a project (which could be used 
-	for subsequent executions) will be deleted.
-	(2.2) HDFS and LOCAL are keywords and must be 
-	present and defined in this file or via command line
-(3) You can define any parameter in Bash-wise style
-	e.g. VAR=13, and use in further part of the script
-	e.g. VAR2=${VAR}.
-(4) You can define any parameter but keywords from commandline
-	using -D<parameter_name>=<parameter_value> syntax.
-	Spaces either in parameter name or value are not allowed
 
-The example of resulting HDFS project localization
-is presented below. As a result of chrum compilation
-in directories HDFS/LOCAL a folder with compilation time is created
-with subfolders with combination of parameters (signed as variables),
-each of which contains folders listed in this file (e.g."lib","pig")
-accomapanied with the "result" folder. In the "result" folder 
-each execution of a workflow (from specified LOCAL folder) 
-create a new folder, which name is taken from execution time.
-
-[/tmp/COMPILATION_TIME/PROJECT]
-   |
-   +----->[COMPILATION_TIME]
-    			 +----->*workflow.chrum*
-    			 +----->*configuration.properties.chrum*
-    			 +----->*conf.chrum*
-    			 +----->lib
-    			 +----->pig
-    			 \----->results
-
-[/tmp/COMPILATION_TIME/PROJECT]
-   |
-   +----->[COMPILATION_TIME]
-    			 +----->[PARAMETER_COMBINATION,e.g.7_src_true]
-     			 |			+----->*workflow.chrum*
-     			 |			+----->*configuration.properties.chrum*
-     			 |			+----->*conf.chrum*
-     			 |			+----->lib
-    			 |			+----->pig
-    			 |			\----->results
-			   (...)
-
-[LOCAL/PROJECT]
-   |
-   +----->[COMPILATION_TIME,e.g.123]
-   |			 +----->[PARAMETER_COMBINATION,e.g.7_src_true]
-   |			 |			+----->*execute-in-oozie.py*
-   | 			 |			+----->*configuration.properties.chrum* / HDFS/(...)/*configuration.properties*
-   | 			 |			+----->*conf.chrum*
-   |			 |			\----->pig
-   |			 |
-   |			 +----->[PARAMETER_COMBINATION,e.g.7_src_false]
-   |			 |			\----->(...)
-   |		   (...)
-   |
-   +----->[COMPILATION_TIME,e.g.126]
-   |			 +----->(...)
- (...)
-
-[HDFS/PROJECT]
-   |
-   +----->[COMPILATION_TIME,e.g.123]
-   |			 +----->[PARAMETER_COMBINATION,e.g.7_src_true]
-   |			 |			+----->*workflow.xml*
-   | 			 |			+----->*configuration.properties*
-   | 			 |			+----->*conf.chrum*
-   |			 |			+----->lib
-   |			 |			+----->pig
-   |			 |			\----->results
-   |			 |		   			+----->[EXECUTION_TIME,e.g.124]
-   |			 |		   			+----->[EXECUTION_TIME,e.g.127]
-   |			 |		   		  (...)
-   |			 |		   			
-   |			 +----->[PARAMETER_COMBINATION,e.g.7_src_false]
-   |			 |			+----->(...)
-   |			 (...)
-   |
-   +----->[COMPILATION_TIME,e.g.126]
-   |			 +----->(...)
- (...)
-
-'''
-
-#hdfs://localhost.localdomain:8020/user/${someuser}/workflows/PROJECT/COMPILATION_TIME/OPTIONS/[RESULTS]/EXEC_TIME
-#lib <- ../../document-classification-1.0-SNAPSHOT.jar
-#HDFS=hdfs://localhost.localdomain/user/${HUSER}/workflows/
-#HDFS=hdfs://localhost.localdomain:8020/user/${HUSER}/workflows/
-
-LOCAL_TRIGGER=/home/pdendek/trigger
 OOZIE_SERVER=localhost.localdomain
 OOZIE_PORT=11000
-lib <- /usr/lib/pig/pig-0.9.2-cdh4.0.1.jar
-#,../../../../document-classification/target/document-classification-1.0-SNAPSHOT.jar
-pig <- ./pig/*
-#That will copy the whole folder
+
+PROJECT=dc_model_creation
 
 HDFS=/user/${HUSER}/workflows/
-LOCAL=/home/username/workflow/
-PROJECT=dc_model_creation
+LOCAL_TRIGGER=/tmp/trigger
+LOCAL=obsolute
+
+lib <- /usr/lib/pig/pig-0.9.2-cdh4.0.1.jar
+pig <- ./pig/*

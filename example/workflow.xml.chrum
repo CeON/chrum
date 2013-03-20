@@ -235,7 +235,6 @@ RETURNS:
 # END:ACTION
 
 # BEG:FORK_MERGE name=split_03 node_after_join=enrich_04 error=kill
-
 @SRC@
 @FOLDS@
 
@@ -247,8 +246,7 @@ RETURNS:
 
 # END:FORK_MERGE
 
-# BEG:FORK_MERGE  name=enrich_04 node_after_join=buildModel_05 error=kill
-
+# BEG:FORK_MERGE name=enrich_04 node_after_join=buildModel_05 error=kill
 @FOLDS@
 @LEV@
 
@@ -260,7 +258,7 @@ RETURNS:
 
 # END:FORK_MERGE
 
-# BEG:FORK_MERGE name=buildModel_05 node_after_join=testModel_06 error=kill
+# BEG:FORK_MERGE  name=buildModel_05 node_after_join=testModel_06 error=kill
 
 @FOLDS@
 		@PIG_START@
@@ -271,7 +269,7 @@ RETURNS:
 
 # END:FORK_MERGE
 
-# BEG:FORK_MERGE name=testModel_06 node_after_join=end error=kill
+# BEG:FORK_MERGE  name=testModel_06 node_after_join=end  error=kill
 
 @FOLDS@
 
