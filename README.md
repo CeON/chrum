@@ -2,7 +2,7 @@ chrum - The Apache Oozie Workflow Generator
 =====
 ----
 
-Check  [wiki page](.wiki/)
+Check  [wiki page](./wiki/)
 
 ----
 
