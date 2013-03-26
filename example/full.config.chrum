@@ -6,11 +6,13 @@
 OOZIE_SERVER=localhost.localdomain
 OOZIE_PORT=11000
 
-PROJECT=dc_model_creation
+PROJECT=test-project
+
+HUSER=pdendek
 
 HDFS=/user/${HUSER}/workflows/
 LOCAL_TRIGGER=/tmp/trigger
 LOCAL=obsolute
 
-lib <- /usr/lib/pig/pig-0.9.2-cdh4.0.1.jar
-pig <- ./pig/*
+lib <- ./jars/oozie_2-0.0.1-SNAPSHOT.jar
+comments <- ./comments/*

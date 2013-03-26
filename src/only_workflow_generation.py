@@ -2,7 +2,7 @@
 
 import sys
 import os 
-from src.for_curious import wf_transformations
+from for_curious import wf_transformations
 
 def writeFile(path,txt):
     f = open(path,'w')
@@ -11,9 +11,10 @@ def writeFile(path,txt):
 
 def main(args):
     execPath = ''
-    if args[0].rindex('/') != -1:
+    try:
+        args[0].rindex('/')
         execPath = args[0][:args[0].rindex('/')] 
-    else:
+    except ValueError:
         execPath = os.getcwd()
 
     wftxt = wf_transformations.main(execPath,args[1],args[2])
@@ -31,7 +32,7 @@ def main(args):
     
 
 if len(sys.argv) < 3 or len(sys.argv) > 5:
-    print "Usage:\n\tpython full_chrum_action.py <oozie-workflow-properties> <chrum-workflow-xml> [<output-xml-destination> [!]]"
+    print "Usage:\n\tpython only_workflow_generation.py <oozie-workflow-properties> <chrum-workflow-xml> [<output-xml-destination> [!]]"
     print "where\n\
     <oozie-workflow-properties> is a path to a Oozie workflow file accompanied with Chrum syntax\n\
     <output-xml-destination> is a path to a generated workflow file e.g. /tmp/output.workflow.xml\n\
