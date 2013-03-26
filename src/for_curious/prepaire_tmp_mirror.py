@@ -24,7 +24,7 @@ def main(compilation_time, keywords, chrumprops, keys, combs, names, directory):
 	
 	for idx,name in enumerate(names):
 		calculateGivenCombination(compilation_time, keywords, chrumprops, keys, combs, names, directory, plainName, name, idx)
-		full_exec.append('os.system(\'python '+directory+'/'+name+'/execute-in-oozie.py'+'\')')
+		full_exec.append('os.system(\'python '+directory+'/'+name+'/execute-in-oozie.py &'+'\')')
 		
 	f = open(directory+'/execute-all-in-oozie.py','w')
 	f.write('\n'.join(full_exec)) 
