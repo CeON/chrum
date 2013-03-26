@@ -133,7 +133,7 @@ os.system(\'hadoop fs -mkdir $hdfsPth/\'+exec_time+\'/\')	\n\
 os.system(\'hadoop fs -put $localWfSrc  $hdfsPth/\'+exec_time+\'/\')	\n\
 os.system(\'hadoop fs -cp $hdfsSrc $hdfsPth/\'+exec_time+\'/\')	\n\
 #list all added files\n\
-os.system(\'hadoop fs -ls $hdfsPth/\'+exec_time+\'/\')	\n\
+#os.system(\'hadoop fs -ls $hdfsPth/\'+exec_time+\'/\')	\n\
 #run oozie workflow\n\
 os.system(\'oozie job -oozie http://$oozie_server:$oozie_port/oozie -config $finalWFPropertiesPath -run\')	\n\
 #os.system(\'oozie job -oozie http://$oozie_server:$oozie_port/oozie -config $hdfsPth/\'+exec_time+\'/cluster.properties -run\')	\n\
