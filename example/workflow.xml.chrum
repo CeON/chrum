@@ -1,5 +1,5 @@
 <!--
- (C) 2010-2012 ICM UW. All rights reserved.
+ (C) 2010-2013 ICM UW. All rights reserved.
 -->
 # BEG:REPLACE @OOZIE-START@
 <workflow-app name='test-project-${opts_infix}' xmlns="uri:oozie:workflow:0.2">
@@ -34,11 +34,11 @@
 
 # BEG:FORK_MERGE  name=testNode node_after_join=end  error=kill
 @classSecond@ 0 1
-@paramSecond@ a b c d
+@paramSecond@ a b 
         <java>
             @CONFIG@
-            <main-class>org.test.Class_${classFirst}_@classSecond@</main-class>
-            <arg>${paramFirst}</arg>
+            <main-class>org.test.AClass${classFirst}_@classSecond@</main-class>
+            <arg>firstParam</arg>
             <arg>@paramSecond@</arg>
             <capture-output/>
         </java>

@@ -33,7 +33,7 @@ def createCoolName(combs,keys):
 		for idx,tup in enumerate(comb):
 			final.append(str(tup))
 #			final.append(str(keys[idx])+'__'+str(tup)+'__')
-		retval.append(','.join(final))
+		retval.append('__'.join(final))
 	return retval
 		
 def calculateParamCombinations(var_val):
