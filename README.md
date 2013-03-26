@@ -2,7 +2,7 @@ chrum - The Apache Oozie Workflow Generator
 =====
 ----
 
-For more information check Chrum's [wiki](https://github.com/pdendek/chrum/wiki)
+For more information check Chrum's [wiki](https://github.com/pdendek/chrum/wiki) or read [the article](http://arxiv.org/abs/1303.5234).
 
 ----
 
