@@ -27,7 +27,11 @@ def main(ChrumPath, PropsPath, WFPath):
 	condic = readConfiguration(con,{})
 	after = allTran(wf,condic,ChrumPath)
 	#print after
-	xml_val = str(xml.dom.minidom.parseString(after).toprettyxml())
+	try:
+		xml_val = str(xml.dom.minidom.parseString(after).toprettyxml())
+	except xml.parsers.expat.ExpatError as e:
+		print after
+		raise e
 	
 	while True:
 		tmp = xml_val
