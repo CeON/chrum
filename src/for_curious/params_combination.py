@@ -22,9 +22,16 @@ def main(propsPath):
 			line = line.strip()
 			for i in re.finditer('^@([^@\W]+?)@([^\n]+)',line):
 				var_val[i.group(1)] = list(re.split('[\s]+',i.group(2).strip()))
-		combs = calculateParamCombinations(var_val)
-		coolNames = createCoolName(combs,var_val.keys())
-		return var_val.keys(), combs, coolNames
+		if len(var_val) != 0:
+			combs = calculateParamCombinations(var_val)
+			coolNames = createCoolName(combs,var_val.keys())
+			retkeys=var_val.keys()
+		else:
+			combs = ['TOO']
+			coolNames= ['TOO']
+			retkeys=['NOKEY']
+			
+		return retkeys, combs, coolNames
 
 def createCoolName(combs,keys):
 	retval = []
